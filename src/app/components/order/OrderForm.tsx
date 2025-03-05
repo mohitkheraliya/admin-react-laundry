@@ -91,6 +91,8 @@ const OrderForm: React.FC = () => {
   const [productCache, setProductCache] = useState<Record<number, any[]>>({});
   const [serviceCache, setServiceCache] = useState<Record<number, any[]>>({});
 
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
@@ -260,6 +262,20 @@ const OrderForm: React.FC = () => {
       setRetrivedData(initialFormData);
     }
   }, [order]);
+
+  useEffect(() => {
+    if (selectedCustomer) {
+      const fullName = `${selectedCustomer.first_name} ${selectedCustomer.last_name}`;
+      setUserSearch(fullName);
+      setIsSearchMode(false);
+
+      setFormData({
+        ...formData,
+        user_id: selectedCustomer.user_id,
+        username: fullName,
+      });
+    }
+  }, [selectedCustomer]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -574,6 +590,11 @@ const OrderForm: React.FC = () => {
     };
 
     await generatePaymentLink(customerInfo);
+  };
+
+  const handleCustomerCreated = (customer: any) => {
+    setSelectedCustomer(customer);
+    setUserModalIsOpen(false);
   };
 
   return (
@@ -910,15 +931,15 @@ const OrderForm: React.FC = () => {
                         />
                       </div>
 
-                      <div>
+                      <div className="flex flex-col">
                         <label
                           htmlFor="description_checkbox"
-                          className="block text-gray-700 text-sm font-bold mb-2"
+                          className="block text-gray-700 text-sm font-bold"
                         >
                           Description
                         </label>
                         <input
-                          className="checkbox checkbox-lg mt-2 ml-5"
+                          className="checkbox checkbox-lg mt-3 ml-5"
                           id="description_checkbox"
                           data-datatable-check="true"
                           type="checkbox"
@@ -931,7 +952,6 @@ const OrderForm: React.FC = () => {
                             )
                           }
                         />
-                        <p className=" text-red-500 text-sm">{"\u00A0"}</p>
                       </div>
                     </div>
                   </div>
@@ -940,7 +960,7 @@ const OrderForm: React.FC = () => {
                     <div>
                       {item.showDescription && (
                         <div>
-                          <div className="flex smmobile:w-[100%] smmobile:justify-self-start flex-col md:w-[350px] lg:w-[420px] sm:w-[300px] h-[80px] mb-2">
+                          <div className="mt-2 flex smmobile:w-[100%] smmobile:justify-self-start flex-col md:w-[350px] lg:w-[420px] sm:w-[300px] h-[80px] mb-2">
                             <label
                               htmlFor="description"
                               className="block text-gray-700 text-sm font-bold mb-2"
@@ -1069,7 +1089,7 @@ const OrderForm: React.FC = () => {
                     ? "input border border-gray-300 rounded-md p-2 bg-gray-100 cursor-not-allowed focus:outline-none"
                     : "input border border-gray-300 rounded-md p-2"
                 }`}
-                readOnly={formData.normal_delivery_charges > 0} 
+                readOnly={formData.normal_delivery_charges > 0}
               />
               <p className="w-full text-red-500 text-sm">
                 {errors.express_delivery_charges || "\u00A0"}
@@ -1306,6 +1326,7 @@ const OrderForm: React.FC = () => {
           userId={formData.user_id}
         />
         <CustomerModal
+          onCustomerCreated={handleCustomerCreated}
           isOpen={userModalIsOpen}
           setIsSubmit={setIsSubmit}
           onClose={() => setUserModalIsOpen(false)}

@@ -9835,3 +9835,12 @@ label.rating-label {
 .block {
   display: inline-block;
 }
+
+.rs-anim-fade {
+  background-color: white !important;
+  position: relative;
+  
+}
+
+
+/* rs-anim-fade rs-anim-in placement-bottom-start rs-picker-popup-daterange rs-picker-popup */

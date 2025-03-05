@@ -1,12 +1,12 @@
 import { useGetOrdersData } from "../../hooks";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { DateRangePicker } from "rsuite";
 import { useEffect, useState } from "react";
 import AreaChart from "react-apexcharts";
-import { FiShoppingCart } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import "rsuite/dist/rsuite-no-reset.min.css";
+import "rsuite/DateRangePicker/styles/index.css";
+import "rsuite/Modal/styles/index.css";
 
 
 const OrderReport = () => {
@@ -27,11 +27,15 @@ const OrderReport = () => {
     }
   }, [formData]);
 
-  const handleDateChange = (newDate: dayjs.Dayjs, field: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: newDate ? newDate.format("DD-MM-YYYY") : "",
-    }));
+  const handleDateChange = (range: [Date | null, Date | null]) => {
+    if (range[0] && range[1]) {
+      setFormData({
+        start_time: dayjs(range[0]).format("DD-MM-YYYY"),
+        end_time: dayjs(range[1]).format("DD-MM-YYYY"),
+      });
+    } else {
+      setFormData({ start_time: "", end_time: "" });
+    }
   };
 
   const categories = orderData
@@ -192,8 +196,14 @@ const OrderReport = () => {
                 </div>
               </h5>
             </div>
-            <div className="self-end mb-3">
-              <FiShoppingCart size={23} color="rgb(13 202 240)" />
+            
+            <div className="self-end mb-3" onClick={(e) => e.stopPropagation()}>
+              <DateRangePicker
+                format="dd-MM-yyyy"
+                placeholder="Select Date Range"
+                onChange={handleDateChange}
+                className="w-[220px]"
+              />
             </div>
           </div>
         </div>

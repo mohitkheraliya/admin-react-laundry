@@ -1,17 +1,17 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-
-const ADD_USER_URL = `${import.meta.env.VITE_BASE_URL}/user`;
+import { BASE_URL } from "../../utils/constant";
 
 const useAddUser = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [newUser, setNewUser] = useState();
 
   const addUser = async (formData: any) => {
     const token = localStorage.getItem("authToken");
     setLoading(true);
 
     try {
-      const response = await fetch(ADD_USER_URL, {
+      const response = await fetch(`${BASE_URL}/user`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -33,9 +33,10 @@ const useAddUser = () => {
       }else{
         toast.success(data.message, { position: "top-center" });
       }
+      setNewUser(data?.data?.result);
       return true;
     } catch (error: any) {
-      toast.error(error?.message || "Error adding banner", {
+      toast.error(error?.message || "Error adding User", {
         position: "top-center",
       });
       return false;
@@ -43,7 +44,7 @@ const useAddUser = () => {
       setLoading(false);
     }
   };
-  return { addUser, loading };
+  return { addUser, newUser, loading };
 };
 
 export default useAddUser;
